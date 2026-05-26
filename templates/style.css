@@ -1,0 +1,35 @@
+body { background-color: #b0b0b0; font-family: 'Segoe UI', sans-serif; margin: 20px; }
+
+.header { 
+    background-color: black; color: white; padding: 15px; 
+    border-radius: 30px; text-align: center; margin-bottom: 20px;
+    font-size: 1.1rem; font-weight: bold;
+}
+
+.container { display: flex; gap: 15px; justify-content: center; min-height: 500px; }
+
+.column { 
+    background-color: black; color: white; border-radius: 35px; 
+    padding: 20px; display: flex; flex-direction: column; align-items: center;
+    flex: 1;
+}
+
+#col-slots { flex: 0.7; }
+#col-historico { flex: 2; }
+
+h2 { font-size: 0.9rem; margin-bottom: 15px; border-bottom: 1px solid #333; width: 90%; text-align: center; padding-bottom: 10px; }
+
+.slot-card {
+    background: #1a1a1a; width: 90%; margin: 8px 0; padding: 15px;
+    border-radius: 15px; text-align: center; border: 1px solid #333;
+}
+
+.status-badge { 
+    padding: 5px 15px; border-radius: 8px; font-weight: bold; 
+    font-size: 0.8rem; margin-top: 10px; display: inline-block; 
+}
+.livre { background-color: #28a745; color: white; }
+.ocupado { background-color: #e63946; color: white; }
+
+table { width: 100%; color: white; border-collapse: collapse; }
+th, td { padding: 10px; text-align: left; border-bottom: 1px solid #222; font-size: 0.8rem; }

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Monitoramento de Kits</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="header">Projeto Computação Embarcada dash Board</div>
+
+    <div class="container">
+        <div class="column" id="col-usuarios">
+            <h2>Usuários</h2>
+            <div id="lista-usuarios"></div>
+        </div>
+
+        <div class="column" id="col-slots">
+            <h2>Slots</h2>
+            <div id="slots-container" style="width: 100%;"></div>
+        </div>
+
+        <div class="column" id="col-historico">
+            <h2>Histórico do Banco de Dados</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data/Hora</th>
+                        <th>Nicho</th>
+                        <th>Status</th>
+                        <th>RA</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-historico"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
