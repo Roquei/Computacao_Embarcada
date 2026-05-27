@@ -10,6 +10,7 @@ char pass[] = "audi1005!";
 int status = WL_IDLE_STATUS;
 
 char server[] = "52.15.237.15";
+int port = 8080;
 WiFiClient client;
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -18,11 +19,11 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 #define RST_PIN 9
 MFRC522 rfid(SS_PIN, RST_PIN);
 
-const int PINOS_SENSORES[4] = {2, 3, 4, 5};       // Sensores Indutivos (Nichos 1 a 4)
-const int PINOS_SERVOS[4]   = {6, 7, 8, A0};      // Servos Motores (Nichos 1 a 4)
+const int PINOS_SENSORES[4] = {2, 3, 4, 5};
+const int PINOS_SERVOS[4]   = {6, 7, 8, A0};  
 
 Servo servos[4];
-bool estadosAnteriores[4] = {true, true, true, true}; // Armazena o estado antigo de cada sensor para evitar envios duplicados
+bool estadosAnteriores[4] = {true, true, true, true};
 
 void enviarStatusBackend(int nichoId, String statusKit, String ra) {
   if (client.connect(server, port)) {
@@ -49,7 +50,6 @@ void setup() {
 
   for (int i = 0; i < 4; i++) {
     pinMode(PINOS_SENSORES[i], INPUT_PULLUP);
-
     servos[i].attach(PINOS_SERVOS[i]);
     servos[i].write(0);
   }
@@ -70,32 +70,27 @@ void setup() {
   lcd.setCursor(0, 1);
   lcd.print("AWS CONECTADA!  ");
   delay(2000);
+  
   lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Aproxime o card ");
+  lcd.setCursor(0, 1);
+  lcd.print("p/ liberar nicho");
 }
 
 void loop() {
   for (int i = 0; i < 4; i++) {
-    bool kitNaVaga = (digitalRead(PINOS_SENSORES[i]) == LOW);
+    bool temMetal = (digitalRead(PINOS_SENSORES[i]) == LOW);
 
-    if (kitNaVaga != estadosAnteriores[i]) {
-      lcd.clear();
+    if (temMetal != estadosAnteriores[i]) {
       int numeroNicho = i + 1;
 
-      if (kitNaVaga) {
-        lcd.setCursor(0, 0);
-        lcd.print("Nicho " + String(numeroNicho) + ": DISPON.");
-        lcd.setCursor(0, 1);
-        lcd.print("Aproxime o Card ");
+      if (temMetal) {
         enviarStatusBackend(numeroNicho, "disponivel", "SISTEMA");
       } else {
-        lcd.setCursor(0, 0);
-        lcd.print("Nicho " + String(numeroNicho) + ": EM USO ");
-        lcd.setCursor(0, 1);
-        lcd.print("Aproxime o Card ");
         enviarStatusBackend(numeroNicho, "ocupado", "RA_USER"); 
       }
-      estadosAnteriores[i] = kitNaVaga;
-      delay(1000); 
+      estadosAnteriores[i] = temMetal;
     }
   }
 
@@ -105,59 +100,49 @@ void loop() {
 
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("Card Detectado!");
+  lcd.print("Detectando se tem");
   lcd.setCursor(0, 1);
-  lcd.print("Buscando Vaga...");
-  delay(1500);
+  lcd.print("nicho disponivel");
+  delay(2000);
 
   int nichoParaAbrir = -1;
+
   for (int i = 0; i < 4; i++) {
-    bool kitNaVaga = (digitalRead(PINOS_SENSORES[i]) == LOW);
+    bool temMetal = (digitalRead(PINOS_SENSORES[i]) == LOW);
     
-    if (kitNaVaga) {
+    if (temMetal) {
       nichoParaAbrir = i; 
-      break; 
-    } else {
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("Nicho " + String(i + 1) + " ocupado");
-      lcd.setCursor(0, 1);
-      lcd.print("Checando proximo");
-      delay(1200);
+      break;
     }
   }
 
-  
   lcd.clear();
   if (nichoParaAbrir != -1) {
     int numeroFinal = nichoParaAbrir + 1;
     
     lcd.setCursor(0, 0);
-    lcd.print("Liberando Vaga");
+    lcd.print("Nicho " + String(numeroFinal) + " disponiv.");
     lcd.setCursor(0, 1);
-    lcd.print("Nicho " + String(numeroFinal) + " !!!      ");
+    lcd.print("Retire o kit... ");
     
     servos[nichoParaAbrir].write(90); 
-    delay(4000); //tempo que a trava fica aberta 4s 
+    delay(4000);                      
 
-    
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Trancando Vaga " + String(numeroFinal));
     servos[nichoParaAbrir].write(0);
-    delay(1500);
 
   } else {
     lcd.setCursor(0, 0);
-    lcd.print("Armario Cheio! ");
+    lcd.print("Nichos ocupados ");
     lcd.setCursor(0, 1);
-    lcd.print("Nenhum Kit Disp.");
+    lcd.print("Nenhum disponiv.");
     delay(3000);
   }
 
-  for (int i = 0; i < 4; i++) {
-    estadosAnteriores[i] = !estadosAnteriores[i];
-  }
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Aproxime o card ");
+  lcd.setCursor(0, 1);
+  lcd.print("p/ liberar nicho");
 
   rfid.PICC_HaltA();
 }
